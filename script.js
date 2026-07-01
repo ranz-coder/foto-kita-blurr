@@ -10,6 +10,7 @@ const modalMessage = document.getElementById('modalMessage');
 const startBtn = document.getElementById('startBtn');
 
 let currentMode = 'normal';
+let isDetecting = false;
 
 function spawnParticles(emoji) {
     const frameRect = photoFrame.getBoundingClientRect();
@@ -109,37 +110,37 @@ hands.setOptions({
 
 hands.onResults(onResults);
 
-const camera = new Camera(videoElement, {
-    onFrame: async () => {
-        await hands.send({ image: videoElement });
-    },
-    width: 640,
-    height: 480
-});
+async function detectFrame() {
+    if (!isDetecting) return;
+    await hands.send({ image: videoElement });
+    requestAnimationFrame(detectFrame);
+}
 
 startBtn.addEventListener('click', () => {
-    startBtn.innerText = "MEMUAT...";
+    startBtn.innerText = "MEMINTA IZIN...";
     
     audioLawan.play().then(() => audioLawan.pause()).catch(e => {});
     audioBlur.play().then(() => audioBlur.pause()).catch(e => {});
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => {
-            stream.getTracks().forEach(track => track.stop());
-            
-            customModal.classList.add('hidden');
-            
-            camera.start().then(() => {
-                statusText.innerText = "✋ Kamera Siap! Silahkan Bergaya";
-            }).catch(err => {
-                statusText.innerText = "Kamera gagal dimuat oleh sistem ❌";
-            });
-        })
-        .catch((err) => {
-            modalTitle.innerText = "❌ AKSES DITOLAK";
-            modalMessage.innerText = "Browser memblokir kamera! Klik ikon gembok/pengaturan di sebelah kiri link URL di atas, lalu 'Izinkan' Kamera dan refresh halaman.";
-            startBtn.innerText = "COBA LAGI";
-            startBtn.style.background = "var(--accent-lawan)";
-            startBtn.style.color = "#fff";
-        });
+    navigator.mediaDevices.getUserMedia({ 
+        video: { width: 640, height: 480 } 
+    })
+    .then((stream) => {
+        customModal.classList.add('hidden');
+        videoElement.srcObject = stream;
+        
+        videoElement.onloadedmetadata = () => {
+            videoElement.play();
+            isDetecting = true;
+            statusText.innerText = "✋ Kamera Siap! Silahkan Bergaya";
+            detectFrame();
+        };
+    })
+    .catch((err) => {
+        modalTitle.innerText = "❌ AKSES DITOLAK";
+        modalMessage.innerText = "Browser memblokir kamera! Pastikan tidak membuka web dari dalam aplikasi (WA/IG/Tiktok), melainkan buka langsung di Chrome. Atau cek ikon gembok di URL untuk izinkan kamera.";
+        startBtn.innerText = "COBA LAGI";
+        startBtn.style.background = "var(--accent-lawan)";
+        startBtn.style.color = "#fff";
+    });
 });
