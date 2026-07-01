@@ -4,6 +4,11 @@ const statusText = document.getElementById('statusText');
 const audioLawan = document.getElementById('audioLawan');
 const audioBlur = document.getElementById('audioBlur');
 
+const customModal = document.getElementById('customModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalMessage = document.getElementById('modalMessage');
+const startBtn = document.getElementById('startBtn');
+
 let currentMode = 'normal';
 
 function spawnParticles(emoji) {
@@ -112,16 +117,29 @@ const camera = new Camera(videoElement, {
     height: 480
 });
 
-navigator.mediaDevices.getUserMedia({ video: true })
-    .then((stream) => {
-        stream.getTracks().forEach(track => track.stop());
-        camera.start().then(() => {
-            statusText.innerText = "✋ Kamera Siap! Silahkan Bergaya";
-        }).catch(err => {
-            statusText.innerText = "Kamera gagal dimuat oleh sistem ❌";
+startBtn.addEventListener('click', () => {
+    startBtn.innerText = "MEMUAT...";
+    
+    audioLawan.play().then(() => audioLawan.pause()).catch(e => {});
+    audioBlur.play().then(() => audioBlur.pause()).catch(e => {});
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+            stream.getTracks().forEach(track => track.stop());
+            
+            customModal.classList.add('hidden');
+            
+            camera.start().then(() => {
+                statusText.innerText = "✋ Kamera Siap! Silahkan Bergaya";
+            }).catch(err => {
+                statusText.innerText = "Kamera gagal dimuat oleh sistem ❌";
+            });
+        })
+        .catch((err) => {
+            modalTitle.innerText = "❌ AKSES DITOLAK";
+            modalMessage.innerText = "Browser memblokir kamera! Klik ikon gembok/pengaturan di sebelah kiri link URL di atas, lalu 'Izinkan' Kamera dan refresh halaman.";
+            startBtn.innerText = "COBA LAGI";
+            startBtn.style.background = "var(--accent-lawan)";
+            startBtn.style.color = "#fff";
         });
-    })
-    .catch((err) => {
-        statusText.innerText = "⚠️ IZINKAN KAMERA DULU!";
-        alert("Browser memblokir kamera! Klik ikon gembok/pengaturan di sebelah kiri link URL di atas, lalu 'Izinkan' Kamera dan refresh halaman.");
-    });
+});
