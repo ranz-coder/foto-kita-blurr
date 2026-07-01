@@ -119,11 +119,22 @@ async function detectFrame() {
 startBtn.addEventListener('click', () => {
     startBtn.innerText = "MEMINTA IZIN...";
     
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        modalTitle.innerText = "❌ TIDAK DIKUNG";
+        modalMessage.innerText = "Browser atau Protokol HTTP kamu tidak mendukung akses kamera. Pastikan menggunakan HTTPS di Vercel.";
+        startBtn.innerText = "ERROR API";
+        return;
+    }
+
     audioLawan.play().then(() => audioLawan.pause()).catch(e => {});
     audioBlur.play().then(() => audioBlur.pause()).catch(e => {});
 
     navigator.mediaDevices.getUserMedia({ 
-        video: { width: 640, height: 480 } 
+        video: { 
+            width: { ideal: 640 }, 
+            height: { ideal: 480 },
+            facingMode: "user"
+        } 
     })
     .then((stream) => {
         customModal.classList.add('hidden');
@@ -137,8 +148,8 @@ startBtn.addEventListener('click', () => {
         };
     })
     .catch((err) => {
-        modalTitle.innerText = "❌ AKSES DITOLAK";
-        modalMessage.innerText = "Browser memblokir kamera! Pastikan tidak membuka web dari dalam aplikasi (WA/IG/Tiktok), melainkan buka langsung di Chrome. Atau cek ikon gembok di URL untuk izinkan kamera.";
+        modalTitle.innerText = "❌ DETAIL ERROR";
+        modalMessage.innerText = `Gagal mendeteksi kamera. Kode Error: ${err.name} - ${err.message}. Hubungi admin untuk perbaikan lokasi izin browser.`;
         startBtn.innerText = "COBA LAGI";
         startBtn.style.background = "var(--accent-lawan)";
         startBtn.style.color = "#fff";
