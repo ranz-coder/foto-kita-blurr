@@ -8,15 +8,53 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-    <div id="customModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2 id="modalTitle">⚠️ PERSIAPAN SISTEM</h2>
-            <p id="modalMessage">Website ini memuat AI Pendeteksi Tangan dan Wajah. Pastikan selalu tersenyum agar tidak memicu mode cemberut.</p>
-            <button id="startBtn">MULAI & IZINKAN KAMERA</button>
+    <div id="onboardingModal" class="modal-overlay">
+        <div class="stepper-container">
+            <div class="stepper-content" id="step1">
+                <h2>⚠️ PERSIAPAN SISTEM</h2>
+                <p>Website ini memuat AI sinkronisasi wajah dan tangan. Pastikan pencahayaan ruangan cukup terang.</p>
+            </div>
+            <div class="stepper-content" id="step2" style="display: none;">
+                <h2>✋ DETEKSI JARI</h2>
+                <p>✋ 5 JARI: Normal | ✌️ 2 JARI: Efek Blur | ☝️ 1 JARI: Efek Suara Telunjuk | ✊ KEPAL: Mode Perang.</p>
+            </div>
+            <div class="stepper-content" id="step3" style="display: none;">
+                <h2>😡 SENSOR KECEMBERUTAN</h2>
+                <p>Pertahankan ekspresi senyum. Jika wajah kamu menekuk cemberut, audio bahaya menyala.</p>
+            </div>
+            <div class="stepper-content" id="step4" style="display: none;">
+                <h2>😲 & 🤭 SENSOR MULUT</h2>
+                <p>Buka mulut lebar untuk mode NGANGAP. Tempelkan telapak tangan menutupi mulut untuk memicu mode rahasia.</p>
+            </div>
+
+            <div class="stepper-footer">
+                <button id="btnBack" class="btn-stepper btn-back" style="visibility: hidden;">MUNDUR</button>
+                <div class="step-indicators">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <button id="btnNext" class="btn-stepper btn-next">LANJUT</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="burgerBtn" class="burger-btn">☰ MENU</button>
+
+    <div id="sideMenu" class="side-menu">
+        <button id="closeMenuBtn" class="close-menu">✖ TANDA SILANG</button>
+        <div class="menu-list">
+            <div class="menu-item">✋ 5 JARI: NORMAL</div>
+            <div class="menu-item">☝️ 1 JARI: TELUNJUK</div>
+            <div class="menu-item">✌️ 2 JARI: BLUR FOTO</div>
+            <div class="menu-item" style="color: #ff3333;">✊ KEPAL: LAWAN 🔥</div>
+            <div class="menu-item" style="color: #00e5ff;">😲 NGANGAP: BUKA MULUT</div>
+            <div class="menu-item" style="color: #ff3333;">😡 CEMBERUT: MARAH</div>
+            <div class="menu-item" style="color: #ffcc00;">🤭 TUTUP MULUT: RAHASIA</div>
         </div>
     </div>
 
@@ -25,33 +63,13 @@
     </header>
 
     <div class="main-container">
-        <div class="tabs-container">
-            <div class="tab-buttons">
-                <button class="tab-btn active" onclick="openTab('instruksi')">INSTRUKSI</button>
-                <button class="tab-btn" onclick="openTab('status-ai')">STATUS AI</button>
-            </div>
-            
-            <div id="instruksi" class="tab-content active">
-                <ul>
-                    <li style="background: #5eff5e;">✋ 5 JARI: Mode Normal</li>
-                    <li style="background: #ff9900;">☝️ 1 JARI: Suara Telunjuk</li>
-                    <li style="background: var(--accent-blur);">✌️ 2 JARI: Mode BLUR</li>
-                    <li style="background: var(--accent-lawan); color: white;">✊ MENGEPAL: Mode LAWAN! 🔥</li>
-                    <li style="background: #ffcc00;">🤭 TUTUP MULUT: Mode Rahasia</li>
-                </ul>
-            </div>
-            
-            <div id="status-ai" class="tab-content">
-                <div class="status-banner" id="emotionStatus" style="font-size: 1.1rem; margin-top: 0;">WAJAH: MENUNGGU AI...</div>
-            </div>
-        </div>
-
         <div class="photo-frame-wrapper">
             <div class="photo-frame" id="photoFrame">
-                <video id="webcam" autoplay playsinline></video>
+                <video id="webcam" autoplay playsinline muted></video>
                 <canvas id="outputCanvas" width="640" height="480"></canvas>
             </div>
-            <div class="status-banner" id="statusText">Menunggu Izin Kamera...</div>
+            <div class="status-banner" id="statusText" style="background: #5eff5e;">Menunggu Panduan Selesai...</div>
+            <div class="status-banner" id="emotionStatus">WAJAH: MENUNGGU AI...</div>
         </div>
     </div>
 
@@ -60,6 +78,7 @@
     <audio id="audioTelunjuk" src="https://cdn.ranzzawok.my.id/media/music/med_cf4dd8e9f4f15298.mp3" loop></audio>
     <audio id="audioCemberut" src="https://cdn.ranzzawok.my.id/media/music/med_c080885d7aa2ab64.mp3" loop></audio>
     <audio id="audioTutupMulut" src="https://cdn.ranzzawok.my.id/media/music/med_d894e15841dd5a1c.mp3" loop></audio>
+    <audio id="audioNgangap" src="https://cdn.ranzzawok.my.id/media/music/med_925f4b301de666b6.mp3" loop></audio>
 
     <script src="script.js"></script>
 </body>
