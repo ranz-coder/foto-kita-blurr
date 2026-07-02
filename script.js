@@ -22,6 +22,7 @@ const audioTelunjuk = document.getElementById('audioTelunjuk');
 const audioCemberut = document.getElementById('audioCemberut');
 const audioTutupMulut = document.getElementById('audioTutupMulut');
 const audioNgangap = document.getElementById('audioNgangap');
+const audioMetal = document.getElementById('audioMetal');
 
 let currentMode = 'normal';
 let isDetecting = false;
@@ -62,7 +63,7 @@ burgerBtn.addEventListener('click', () => sideMenu.classList.add('open'));
 closeMenuBtn.addEventListener('click', () => sideMenu.classList.remove('open'));
 
 function stopAllSound() {
-    [audioLawan, audioBlur, audioTelunjuk, audioCemberut, audioTutupMulut, audioNgangap].forEach(audio => {
+    [audioLawan, audioBlur, audioTelunjuk, audioCemberut, audioTutupMulut, audioNgangap, audioMetal].forEach(audio => {
         audio.pause();
         audio.currentTime = 0;
     });
@@ -105,6 +106,7 @@ function updateState(mode) {
         if (mode === 'telunjuk') spawnParticles('☝️');
         if (mode === 'tutup_mulut') spawnParticles('🤭');
         if (mode === 'ngangap') spawnParticles('😲');
+        if (mode === 'metal') spawnParticles('🤟');
         return;
     }
     
@@ -112,32 +114,52 @@ function updateState(mode) {
     
     if (mode === 'normal') {
         statusText.innerText = "✋ NORMAL MODE";
+        statusText.style.background = "#5eff5e";
+        statusText.style.color = "#000";
         photoFrame.className = 'photo-frame';
         stopAllSound();
     } else if (mode === 'blur') {
         statusText.innerText = "✌️ BLUR MODE! 😆";
+        statusText.style.background = "var(--accent-blur)";
+        statusText.style.color = "#000";
         photoFrame.className = 'photo-frame state-blur';
         playSound(audioBlur);
     } else if (mode === 'lawan') {
         statusText.innerText = "✊ LAWAN!!! 🔥🔥🔥";
+        statusText.style.background = "var(--accent-lawan)";
+        statusText.style.color = "#fff";
         photoFrame.className = 'photo-frame state-lawan';
         playSound(audioLawan);
     } else if (mode === 'telunjuk') {
         statusText.innerText = "☝️ MODE TELUNJUK";
+        statusText.style.background = "#ff9900";
+        statusText.style.color = "#000";
         photoFrame.className = 'photo-frame';
         playSound(audioTelunjuk);
     } else if (mode === 'cemberut') {
         statusText.innerText = "😡 MODE CEMBERUT!!!";
+        statusText.style.background = "var(--accent-lawan)";
+        statusText.style.color = "#fff";
         photoFrame.className = 'photo-frame state-lawan';
         playSound(audioCemberut);
     } else if (mode === 'tutup_mulut') {
         statusText.innerText = "🤭 MODE TUTUP MULUT";
+        statusText.style.background = "#ffcc00";
+        statusText.style.color = "#000";
         photoFrame.className = 'photo-frame';
         playSound(audioTutupMulut);
     } else if (mode === 'ngangap') {
         statusText.innerText = "😲 MODE NGANGAP!!!";
+        statusText.style.background = "var(--accent-blur)";
+        statusText.style.color = "#000";
         photoFrame.className = 'photo-frame';
         playSound(audioNgangap);
+    } else if (mode === 'metal') {
+        statusText.innerText = "🤟 MODE METAL!!!";
+        statusText.style.background = "#b300ff";
+        statusText.style.color = "#fff";
+        photoFrame.className = 'photo-frame state-lawan'; 
+        playSound(audioMetal);
     }
 }
 
@@ -156,6 +178,8 @@ function checkCombinedState() {
         finalMode = 'ngangap';
     } else if (faceMode === 'cemberut') {
         finalMode = 'cemberut';
+    } else if (handMode === 'metal') {
+        finalMode = 'metal';
     } else if (handMode === 'lawan') {
         finalMode = 'lawan';
     } else if (handMode === 'blur') {
@@ -178,13 +202,22 @@ function onHandResults(results) {
         const middleOpen = landmarks[12].y < landmarks[10].y;
         const ringOpen = landmarks[16].y < landmarks[14].y;
         const pinkyOpen = landmarks[20].y < landmarks[18].y;
+        
         const openedFingers = [indexOpen, middleOpen, ringOpen, pinkyOpen].filter(Boolean).length;
 
-        if (openedFingers === 4) handMode = 'normal';
-        else if (indexOpen && middleOpen && !ringOpen && !pinkyOpen) handMode = 'blur';
-        else if (indexOpen && !middleOpen && !ringOpen && !pinkyOpen) handMode = 'telunjuk';
-        else if (!indexOpen && !middleOpen && !ringOpen && !pinkyOpen) handMode = 'lawan';
-        else handMode = 'normal';
+        if (openedFingers === 4) {
+            handMode = 'normal';
+        } else if (indexOpen && !middleOpen && !ringOpen && pinkyOpen) {
+            handMode = 'metal';
+        } else if (indexOpen && middleOpen && !ringOpen && !pinkyOpen) {
+            handMode = 'blur';
+        } else if (indexOpen && !middleOpen && !ringOpen && !pinkyOpen) {
+            handMode = 'telunjuk';
+        } else if (!indexOpen && !middleOpen && !ringOpen && !pinkyOpen) {
+            handMode = 'lawan';
+        } else {
+            handMode = 'normal';
+        }
     } else {
         handMode = 'normal';
         handPos = null;
@@ -256,7 +289,7 @@ async function startSystem() {
     onboardingModal.style.display = 'none';
     statusText.innerText = "MEMINTA IZIN KAMERA...";
 
-    [audioLawan, audioBlur, audioTelunjuk, audioCemberut, audioTutupMulut, audioNgangap].forEach(audio => {
+    [audioLawan, audioBlur, audioTelunjuk, audioCemberut, audioTutupMulut, audioNgangap, audioMetal].forEach(audio => {
         audio.play().then(() => audio.pause()).catch(() => {});
     });
 
