@@ -144,16 +144,21 @@ function onFaceResults(results) {
     const avgCorner = (leftMouth + rightMouth) / 2;
     const diff = avgCorner - bottomLip;
 
-    if (diff < -0.01) {
+    if (diff > 0.015) {
+        emotionStatus.innerText = `WAJAH: 😡 CEMBERUT (SKOR: ${diff.toFixed(3)})`;
+        emotionStatus.style.background = "#ff3333";
+        emotionStatus.style.color = "#fff";
+        faceMode = 'cemberut';
+    } else if (diff < -0.01) {
         emotionStatus.innerText = `WAJAH: 😁 SENYUM (SKOR: ${diff.toFixed(3)})`;
         emotionStatus.style.background = "#5eff5e";
         emotionStatus.style.color = "#000";
         faceMode = 'normal';
     } else {
-        emotionStatus.innerText = `WAJAH: 😡 TIDAK SENYUM (SKOR: ${diff.toFixed(3)})`;
-        emotionStatus.style.background = "#ff3333";
-        emotionStatus.style.color = "#fff";
-        faceMode = 'cemberut';
+        emotionStatus.innerText = `WAJAH: 😐 DATAR (SKOR: ${diff.toFixed(3)})`;
+        emotionStatus.style.background = "#fff";
+        emotionStatus.style.color = "#000";
+        faceMode = 'normal';
     }
 
     checkCombinedState();
