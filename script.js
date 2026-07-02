@@ -23,10 +23,28 @@ let faceMode = 'normal';
 
 let mouthPos = null;
 let handPos = null;
+let lastParticleTime = 0;
+
+function openTab(tabId) {
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.remove('active'));
+    
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
 
 function spawnParticles(emoji) {
+    const now = Date.now();
+    if (now - lastParticleTime < 250) {
+        return;
+    }
+    lastParticleTime = now;
+
     const frameRect = photoFrame.getBoundingClientRect();
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
         particle.innerText = emoji;
