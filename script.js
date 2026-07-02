@@ -9,6 +9,7 @@ const audioLawan = document.getElementById('audioLawan');
 const audioBlur = document.getElementById('audioBlur');
 const audioTelunjuk = document.getElementById('audioTelunjuk');
 const audioCemberut = document.getElementById('audioCemberut');
+const audioTutupMulut = document.getElementById('audioTutupMulut');
 
 const customModal = document.getElementById('customModal');
 const modalTitle = document.getElementById('modalTitle');
@@ -19,6 +20,9 @@ let currentMode = 'normal';
 let isDetecting = false;
 let handMode = 'normal';
 let faceMode = 'normal';
+
+let mouthPos = null;
+let handPos = null;
 
 function spawnParticles(emoji) {
     const frameRect = photoFrame.getBoundingClientRect();
@@ -43,6 +47,7 @@ function stopAllSound() {
     audioBlur.pause();
     audioTelunjuk.pause();
     audioCemberut.pause();
+    audioTutupMulut.pause();
 }
 
 function playSound(audioToPlay) {
@@ -55,6 +60,15 @@ function playSound(audioToPlay) {
 
 function checkCombinedState() {
     let finalMode = 'normal';
+
+    if (mouthPos && handPos) {
+        const distance = Math.hypot(mouthPos.x - handPos.x, mouthPos.y - handPos.y);
+        if (distance < 0.1) {
+            finalMode = 'tutup_mulut';
+            updateState(finalMode);
+            return;
+        }
+    }
 
     if (faceMode === 'cemberut') {
         finalMode = 'cemberut';
@@ -79,6 +93,9 @@ function onHandResults(results) {
         }
 
         const landmarks = results.multiHandLandmarks[0];
+        
+        handPos = { x: landmarks[9].x, y: landmarks[9].y };
+
         const indexOpen = landmarks[8].y < landmarks[6].y;
         const middleOpen = landmarks[12].y < landmarks[10].y;
         const ringOpen = landmarks[16].y < landmarks[14].y;
@@ -99,6 +116,7 @@ function onHandResults(results) {
         }
     } else {
         handMode = 'normal';
+        handPos = null;
     }
     
     checkCombinedState();
@@ -110,11 +128,15 @@ function onFaceResults(results) {
         emotionStatus.style.background = "#fff";
         emotionStatus.style.color = "#000";
         faceMode = 'normal';
+        mouthPos = null;
         checkCombinedState();
         return;
     }
 
     const lm = results.multiFaceLandmarks[0];
+    
+    mouthPos = { x: lm[13].x, y: lm[13].y };
+
     const leftMouth = lm[61].y;
     const rightMouth = lm[291].y;
     const bottomLip = lm[14].y;
@@ -122,21 +144,16 @@ function onFaceResults(results) {
     const avgCorner = (leftMouth + rightMouth) / 2;
     const diff = avgCorner - bottomLip;
 
-    if (diff > 0.012) {
-        emotionStatus.innerText = `WAJAH: 😡 CEMBERUT (SKOR: ${diff.toFixed(3)})`;
-        emotionStatus.style.background = "#ff3333";
-        emotionStatus.style.color = "#fff";
-        faceMode = 'cemberut';
-    } else if (diff < -0.01) {
-        emotionStatus.innerText = `WAJAH: 😁 SENANG (SKOR: ${diff.toFixed(3)})`;
+    if (diff < -0.01) {
+        emotionStatus.innerText = `WAJAH: 😁 SENYUM (SKOR: ${diff.toFixed(3)})`;
         emotionStatus.style.background = "#5eff5e";
         emotionStatus.style.color = "#000";
         faceMode = 'normal';
     } else {
-        emotionStatus.innerText = `WAJAH: 😐 DATAR (SKOR: ${diff.toFixed(3)})`;
-        emotionStatus.style.background = "#fff";
-        emotionStatus.style.color = "#000";
-        faceMode = 'normal';
+        emotionStatus.innerText = `WAJAH: 😡 TIDAK SENYUM (SKOR: ${diff.toFixed(3)})`;
+        emotionStatus.style.background = "#ff3333";
+        emotionStatus.style.color = "#fff";
+        faceMode = 'cemberut';
     }
 
     checkCombinedState();
@@ -148,6 +165,7 @@ function updateState(mode) {
         if (mode === 'lawan') spawnParticles('🔥');
         if (mode === 'cemberut') spawnParticles('😡');
         if (mode === 'telunjuk') spawnParticles('☝️');
+        if (mode === 'tutup_mulut') spawnParticles('🤭');
         return;
     }
     
@@ -186,6 +204,12 @@ function updateState(mode) {
         statusText.style.color = "#fff";
         photoFrame.classList.add('state-lawan');
         playSound(audioCemberut);
+    }
+    else if (mode === 'tutup_mulut') {
+        statusText.innerText = "🤭 MODE TUTUP MULUT";
+        statusText.style.background = "#ffcc00";
+        statusText.style.color = "#000";
+        playSound(audioTutupMulut);
     }
 }
 
@@ -232,6 +256,7 @@ startBtn.addEventListener('click', () => {
     audioBlur.play().then(() => audioBlur.pause()).catch(e => {});
     audioTelunjuk.play().then(() => audioTelunjuk.pause()).catch(e => {});
     audioCemberut.play().then(() => audioCemberut.pause()).catch(e => {});
+    audioTutupMulut.play().then(() => audioTutupMulut.pause()).catch(e => {});
 
     navigator.mediaDevices.getUserMedia({ 
         video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" } 
