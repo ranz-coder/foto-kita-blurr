@@ -149,7 +149,7 @@ function onFaceResults(results) {
     const avgCorner = (leftMouth + rightMouth) / 2;
     const diff = avgCorner - bottomLip;
 
-    if (diff > 0.015) {
+    if (diff > 0.005) {
         emotionStatus.innerText = `WAJAH: 😡 CEMBERUT (SKOR: ${diff.toFixed(3)})`;
         emotionStatus.style.background = "#ff3333";
         emotionStatus.style.color = "#fff";
