@@ -63,9 +63,8 @@ function checkCombinedState() {
 
     if (mouthPos && handPos) {
         const distance = Math.hypot(mouthPos.x - handPos.x, mouthPos.y - handPos.y);
-        if (distance < 0.1) {
-            finalMode = 'tutup_mulut';
-            updateState(finalMode);
+        if (distance < 0.15) {
+            updateState('tutup_mulut');
             return;
         }
     }
@@ -87,11 +86,6 @@ function onHandResults(results) {
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        for (const landmarks of results.multiHandLandmarks) {
-            drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#00ff00', lineWidth: 4});
-            drawLandmarks(canvasCtx, landmarks, {color: '#ff0000', lineWidth: 2, radius: 3});
-        }
-
         const landmarks = results.multiHandLandmarks[0];
         
         handPos = { x: landmarks[9].x, y: landmarks[9].y };
@@ -136,6 +130,17 @@ function onFaceResults(results) {
     const lm = results.multiFaceLandmarks[0];
     
     mouthPos = { x: lm[13].x, y: lm[13].y };
+
+    if (handPos) {
+        const distance = Math.hypot(mouthPos.x - handPos.x, mouthPos.y - handPos.y);
+        if (distance < 0.15) {
+            emotionStatus.innerText = "WAJAH: TERTUTUP TANGAN 🤭";
+            emotionStatus.style.background = "#ffcc00";
+            emotionStatus.style.color = "#000";
+            checkCombinedState();
+            return;
+        }
+    }
 
     const leftMouth = lm[61].y;
     const rightMouth = lm[291].y;
