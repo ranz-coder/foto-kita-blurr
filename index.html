@@ -14,27 +14,36 @@
 
     <div id="customModal" class="modal-overlay">
         <div class="modal-content">
-            <h2 id="modalTitle">⚠️ PERSIAPAN SISTEM BERAT</h2>
-            <p id="modalMessage">Website ini memuat AI Pendeteksi Tangan dan Wajah. Kamu HARUS SELALU TERSENYUM saat menggunakannya.</p>
+            <h2 id="modalTitle">⚠️ PERSIAPAN SISTEM</h2>
+            <p id="modalMessage">Website ini memuat AI Pendeteksi Tangan dan Wajah. Pastikan selalu tersenyum agar tidak memicu mode cemberut.</p>
             <button id="startBtn">MULAI & IZINKAN KAMERA</button>
         </div>
     </div>
 
     <header>
-        <h1>GESTURE CONTROL</h1>
+        <h1>GESTURE CONTROL LIVE PHOTO</h1>
     </header>
 
     <div class="main-container">
-        <div class="info-panel">
-            <h2>CARA PAKAI 🎯</h2>
-            <ul>
-                <li style="background: #5eff5e;">✋ 5 JARI: Mode Normal</li>
-                <li style="background: #ff9900;">☝️ 1 JARI: Suara Adadeh</li>
-                <li style="background: var(--accent-blur);">✌️ 2 JARI: Mode BLUR</li>
-                <li style="background: var(--accent-lawan); color: white;">✊ MENGEPAL: Mode LAWAN! 🔥</li>
-                <li style="background: #8b0000; color: white;">😡 WAJAH cemberut: Mode Cemberut (WAJIB SENYUM)</li>
-                <li style="background: #ffcc00;">🤭 TUTUP MULUT: Mode Rahasia</li>
-            </ul>
+        <div class="tabs-container">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="openTab('instruksi')">INSTRUKSI</button>
+                <button class="tab-btn" onclick="openTab('status-ai')">STATUS AI</button>
+            </div>
+            
+            <div id="instruksi" class="tab-content active">
+                <ul>
+                    <li style="background: #5eff5e;">✋ 5 JARI: Mode Normal</li>
+                    <li style="background: #ff9900;">☝️ 1 JARI: Suara Telunjuk</li>
+                    <li style="background: var(--accent-blur);">✌️ 2 JARI: Mode BLUR</li>
+                    <li style="background: var(--accent-lawan); color: white;">✊ MENGEPAL: Mode LAWAN! 🔥</li>
+                    <li style="background: #ffcc00;">🤭 TUTUP MULUT: Mode Rahasia</li>
+                </ul>
+            </div>
+            
+            <div id="status-ai" class="tab-content">
+                <div class="status-banner" id="emotionStatus" style="font-size: 1.1rem; margin-top: 0;">WAJAH: MENUNGGU AI...</div>
+            </div>
         </div>
 
         <div class="photo-frame-wrapper">
@@ -43,7 +52,6 @@
                 <canvas id="outputCanvas" width="640" height="480"></canvas>
             </div>
             <div class="status-banner" id="statusText">Menunggu Izin Kamera...</div>
-            <div class="status-banner" id="emotionStatus" style="font-size: 1.2rem;">WAJAH: MENUNGGU AI...</div>
         </div>
     </div>
 
