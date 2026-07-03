@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LIVE PHOTO GESTURE</title>
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 </head>
@@ -19,7 +18,8 @@
             </div>
             <div class="stepper-content" id="step2" style="display: none;">
                 <h2>LIST DETEKSI JARI</h2>
-                <p>✋ 5 JARI: Normal | ✌️ 2 JARI: Foto Blur | ☝️ 1 JARI: Suara Antek | ✊ KEPAL: Mode Perang | 🤟 METAL: Mode Kicau Sunda.</p>
+                <p>✋ 5 JARI: Normal | ✌️ 2 JARI: Blur | ☝️ 1 JARI: Suara Antek | ✊ 1 KEPAL: Perang | 🤟 METAL: Kicau Sunda.</p>
+                <p style="margin-top: 10px; background: #ffe600;">🤷🏻‍♀️ 2 TANGAN BUKA: Kenapa Nyak | ✊✊ 2 TANGAN KEPAL: Super Lawan.</p>
             </div>
             <div class="stepper-content" id="step3" style="display: none;">
                 <h2>SENSOR KECEMBERUTAN</h2>
@@ -43,19 +43,21 @@
         </div>
     </div>
 
-    <button id="burgerBtn" class="burger-btn">☰</button>
+    <button id="burgerBtn" class="burger-btn">☰ MENU</button>
 
     <div id="sideMenu" class="side-menu">
         <button id="closeMenuBtn" class="close-menu">✖ TUTUP MENU</button>
         <div class="menu-list">
-            <div class="menu-item">✋ 5 JARI: NORMAL</div>
+            <div class="menu-item">✋ 1 TANGAN: NORMAL</div>
             <div class="menu-item">☝️ 1 JARI: TELUNJUK</div>
             <div class="menu-item">✌️ 2 JARI: BLUR FOTO</div>
-            <div class="menu-item">✊ KEPAL: LAWAN 🔥</div>
+            <div class="menu-item">✊ 1 KEPAL: LAWAN 🔥</div>
             <div class="menu-item">🤟 METAL: KICAU SUNDA</div>
-            <div class="menu-item">😲 NGANGAP: AAAAA</div>
-            <div class="menu-item">😡 CEMBERUT: GALAU</div>
-            <div class="menu-item">🤭 TUTUP MULUT: RAHASIA</div>
+            <div class="menu-item" style="color: #ff99ff;">🤷🏻‍♀️ 2 TANGAN BUKA: KENAPA NYAK</div>
+            <div class="menu-item" style="color: #8b0000;">✊✊ 2 KEPAL: SUPER LAWAN</div>
+            <div class="menu-item" style="color: #00e5ff;">😲 NGANGAP: BUKA MULUT</div>
+            <div class="menu-item" style="color: #ff3333;">😡 CEMBERUT: MARAH</div>
+            <div class="menu-item" style="color: #ffcc00;">🤭 TUTUP MULUT: RAHASIA</div>
         </div>
     </div>
 
@@ -81,18 +83,16 @@
     <audio id="audioTutupMulut" src="https://cdn.ranzzawok.my.id/media/music/med_d894e15841dd5a1c.mp3" loop></audio>
     <audio id="audioNgangap" src="https://cdn.ranzzawok.my.id/media/music/med_925f4b301de666b6.mp3" loop></audio>
     <audio id="audioMetal" src="https://cdn.ranzzawok.my.id/media/music/med_a32f55f242434b67.mp3" loop></audio>
-
-    <script src="script.js"></script>
+    <audio id="audioShrug" src="https://cdn.ranzzawok.my.id/media/music/med_6628f4b010331a5d.mp3" loop></audio>
+    <audio id="audioKepalDua" src="https://cdn.ranzzawok.my.id/media/music/med_efa38153d4d7ac2e.mp3" loop></audio>
 
     <footer style="margin-top: 40px; padding: 20px; text-align: center; border-top: 4px solid #000; width: 100%;">
         <p style="font-size: 1.1rem; font-weight: bold;">
             PROJECT SOURCE CODE: 
-            <a href="https://github.com/ranz-coder/foto-kita-blurr/" target="_blank" 
-               style="color: #000; text-decoration: underline; font-weight: 900;">
-               GITHUB REPOSITORY
-            </a>
+            <a href="https://github.com/ranz-coder/foto-kita-blurr/" target="_blank" style="color: #000; text-decoration: underline; font-weight: 900;">GITHUB REPOSITORY</a>
         </p>
     </footer>
-    
+
+    <script src="script.js"></script>
 </body>
 </html>

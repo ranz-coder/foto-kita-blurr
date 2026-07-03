@@ -23,6 +23,8 @@ const audioCemberut = document.getElementById('audioCemberut');
 const audioTutupMulut = document.getElementById('audioTutupMulut');
 const audioNgangap = document.getElementById('audioNgangap');
 const audioMetal = document.getElementById('audioMetal');
+const audioShrug = document.getElementById('audioShrug');
+const audioKepalDua = document.getElementById('audioKepalDua');
 
 let currentMode = 'normal';
 let isDetecting = false;
@@ -63,7 +65,11 @@ burgerBtn.addEventListener('click', () => sideMenu.classList.add('open'));
 closeMenuBtn.addEventListener('click', () => sideMenu.classList.remove('open'));
 
 function stopAllSound() {
-    [audioLawan, audioBlur, audioTelunjuk, audioCemberut, audioTutupMulut, audioNgangap, audioMetal].forEach(audio => {
+    [
+        audioLawan, audioBlur, audioTelunjuk, audioCemberut, 
+        audioTutupMulut, audioNgangap, audioMetal, 
+        audioShrug, audioKepalDua
+    ].forEach(audio => {
         audio.pause();
         audio.currentTime = 0;
     });
@@ -107,6 +113,8 @@ function updateState(mode) {
         if (mode === 'tutup_mulut') spawnParticles('🤭');
         if (mode === 'ngangap') spawnParticles('😲');
         if (mode === 'metal') spawnParticles('🤟');
+        if (mode === 'shrug') spawnParticles('🤷🏻‍♀️');
+        if (mode === 'kepal_dua') spawnParticles('✊');
         return;
     }
     
@@ -125,7 +133,7 @@ function updateState(mode) {
         photoFrame.className = 'photo-frame state-blur';
         playSound(audioBlur);
     } else if (mode === 'lawan') {
-        statusText.innerText = "✊ LAWAN!!! 🔥🔥🔥";
+        statusText.innerText = "✊ 1 KEPAL: LAWAN!!! 🔥";
         statusText.style.background = "var(--accent-lawan)";
         statusText.style.color = "#fff";
         photoFrame.className = 'photo-frame state-lawan';
@@ -155,11 +163,23 @@ function updateState(mode) {
         photoFrame.className = 'photo-frame';
         playSound(audioNgangap);
     } else if (mode === 'metal') {
-        statusText.innerText = "🤟 MODE METAL!!!";
+        statusText.innerText = "🤟 MODE KICAU SUNDA";
         statusText.style.background = "#b300ff";
         statusText.style.color = "#fff";
         photoFrame.className = 'photo-frame state-lawan'; 
         playSound(audioMetal);
+    } else if (mode === 'shrug') {
+        statusText.innerText = "🤷🏻‍♀️ KENAPA NYAK?!";
+        statusText.style.background = "#ff99ff";
+        statusText.style.color = "#000";
+        photoFrame.className = 'photo-frame'; 
+        playSound(audioShrug);
+    } else if (mode === 'kepal_dua') {
+        statusText.innerText = "✊✊ SUPER LAWAN!!!";
+        statusText.style.background = "#8b0000";
+        statusText.style.color = "#fff";
+        photoFrame.className = 'photo-frame state-lawan'; 
+        playSound(audioKepalDua);
     }
 }
 
@@ -178,6 +198,10 @@ function checkCombinedState() {
         finalMode = 'ngangap';
     } else if (faceMode === 'cemberut') {
         finalMode = 'cemberut';
+    } else if (handMode === 'kepal_dua') {
+        finalMode = 'kepal_dua';
+    } else if (handMode === 'shrug') {
+        finalMode = 'shrug';
     } else if (handMode === 'metal') {
         finalMode = 'metal';
     } else if (handMode === 'lawan') {
@@ -191,32 +215,50 @@ function checkCombinedState() {
     updateState(finalMode);
 }
 
+function countFingers(landmarks) {
+    const indexOpen = landmarks[8].y < landmarks[6].y;
+    const middleOpen = landmarks[12].y < landmarks[10].y;
+    const ringOpen = landmarks[16].y < landmarks[14].y;
+    const pinkyOpen = landmarks[20].y < landmarks[18].y;
+    return {
+        count: [indexOpen, middleOpen, ringOpen, pinkyOpen].filter(Boolean).length,
+        indexOpen, middleOpen, ringOpen, pinkyOpen
+    };
+}
+
 function onHandResults(results) {
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
     
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        const landmarks = results.multiHandLandmarks[0];
-        handPos = { x: landmarks[9].x, y: landmarks[9].y };
+        handPos = { x: results.multiHandLandmarks[0][9].x, y: results.multiHandLandmarks[0][9].y };
 
-        const indexOpen = landmarks[8].y < landmarks[6].y;
-        const middleOpen = landmarks[12].y < landmarks[10].y;
-        const ringOpen = landmarks[16].y < landmarks[14].y;
-        const pinkyOpen = landmarks[20].y < landmarks[18].y;
-        
-        const openedFingers = [indexOpen, middleOpen, ringOpen, pinkyOpen].filter(Boolean).length;
+        if (results.multiHandLandmarks.length === 2) {
+            const hand1 = countFingers(results.multiHandLandmarks[0]);
+            const hand2 = countFingers(results.multiHandLandmarks[1]);
 
-        if (openedFingers === 4) {
-            handMode = 'normal';
-        } else if (indexOpen && !middleOpen && !ringOpen && pinkyOpen) {
-            handMode = 'metal';
-        } else if (indexOpen && middleOpen && !ringOpen && !pinkyOpen) {
-            handMode = 'blur';
-        } else if (indexOpen && !middleOpen && !ringOpen && !pinkyOpen) {
-            handMode = 'telunjuk';
-        } else if (!indexOpen && !middleOpen && !ringOpen && !pinkyOpen) {
-            handMode = 'lawan';
+            if (hand1.count === 0 && hand2.count === 0) {
+                handMode = 'kepal_dua';
+            } else if (hand1.count === 4 && hand2.count === 4) {
+                handMode = 'shrug';
+            } else {
+                handMode = 'normal';
+            }
         } else {
-            handMode = 'normal';
+            const hand1 = countFingers(results.multiHandLandmarks[0]);
+            
+            if (hand1.count === 4) {
+                handMode = 'normal';
+            } else if (hand1.indexOpen && !hand1.middleOpen && !hand1.ringOpen && hand1.pinkyOpen) {
+                handMode = 'metal';
+            } else if (hand1.indexOpen && hand1.middleOpen && !hand1.ringOpen && !hand1.pinkyOpen) {
+                handMode = 'blur';
+            } else if (hand1.indexOpen && !hand1.middleOpen && !hand1.ringOpen && !hand1.pinkyOpen) {
+                handMode = 'telunjuk';
+            } else if (!hand1.indexOpen && !hand1.middleOpen && !hand1.ringOpen && !hand1.pinkyOpen) {
+                handMode = 'lawan';
+            } else {
+                handMode = 'normal';
+            }
         }
     } else {
         handMode = 'normal';
@@ -289,7 +331,11 @@ async function startSystem() {
     onboardingModal.style.display = 'none';
     statusText.innerText = "MEMINTA IZIN KAMERA...";
 
-    [audioLawan, audioBlur, audioTelunjuk, audioCemberut, audioTutupMulut, audioNgangap, audioMetal].forEach(audio => {
+    [
+        audioLawan, audioBlur, audioTelunjuk, audioCemberut, 
+        audioTutupMulut, audioNgangap, audioMetal, 
+        audioShrug, audioKepalDua
+    ].forEach(audio => {
         audio.play().then(() => audio.pause()).catch(() => {});
     });
 
@@ -315,7 +361,7 @@ function runAI() {
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
     });
     hands.setOptions({
-        maxNumHands: 1,
+        maxNumHands: 2, 
         modelComplexity: 1,
         minDetectionConfidence: 0.5,
         minTrackingConfidence: 0.5
